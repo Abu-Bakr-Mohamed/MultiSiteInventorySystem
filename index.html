@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <h1>INVENTORY MANAGEMENT</h1>
+
+    <!-- Database Selection -->
+    <label for="database-select">
+        Select Site:
+        <select id="database-select">
+            <option value="AlexInventory">AlexInventory</option>
+            <option value="CairoInventory">CairoInventory</option>
+        </select>
+    </label>
+
+    <h2>Products</h2>
+    <table id="products-table">
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <h3>Add / Update Product</h3>
+    <form id="product-form">
+        <label>
+            Product ID:
+        </label>
+        <input type="number" id="product-id" required>
+        <label>
+            Product Name:
+        </label>
+        <input type="text" id="product-name" required>
+        <label>
+            Category:
+        </label>
+        <input type="text" id="category" required>
+        <label>
+            Price:
+        </label>
+        <input type="number" id="price" step="0.01" required>
+        <button type="submit">SAVE PRODUCT</button>
+    </form>
+
+    <script>
+        async function fetchProducts() {
+            const database = document.getElementById("database-select").value;
+            try {
+                const response = await fetch(`http://localhost:3000/products?database=${database}`);
+                console.log(response);
+                const products = await response.json();
+                const tableBody = document.querySelector("#products-table tbody");
+                tableBody.innerHTML = "";
+                products.forEach((product) => {
+                    const row = `
+                        <tr>
+                            <td>${product.ProductID}</td>
+                            <td>${product.ProductName}</td>
+                            <td>${product.Category}</td>
+                            <td>${product.Price}</td>
+                            <td>
+                                <button onclick="editProduct(${product.ProductID})">EDIT</button>
+                                <button onclick="deleteProduct(${product.ProductID})">DELETE</button>
+                            </td>
+                        </tr>`;
+                    tableBody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error("Error fetching products:", error);
+            }
+        }
+
+        document.getElementById("product-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const database = document.getElementById("database-select").value;
+
+            const productID = document.getElementById("product-id").value;
+            const product = {
+                ProductID: productID,
+                ProductName: document.getElementById("product-name").value,
+                Category: document.getElementById("category").value,
+                Price: parseFloat(document.getElementById("price").value),
+            };
+
+            const isUpdate = document.getElementById("product-id").disabled;
+            const method = isUpdate ? "PUT" : "POST";
+            const url = isUpdate
+                ? `http://localhost:3000/products/${productID}?database=${database}`
+                : `http://localhost:3000/products?database=${database}`;
+
+            await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(product),
+            });
+
+            document.getElementById("product-form").reset();
+            document.getElementById("product-id").disabled = false;
+            fetchProducts();
+        });
+
+        async function editProduct(id) {
+            const database = document.getElementById("database-select").value;
+            const response = await fetch(`http://localhost:3000/products?database=${database}`);
+            const products = await response.json();
+            const product = products.find((p) => p.ProductID === id);
+
+            document.getElementById("product-id").value = product.ProductID;
+            document.getElementById("product-id").disabled = true;
+            document.getElementById("product-name").value = product.ProductName;
+            document.getElementById("category").value = product.Category;
+            document.getElementById("price").value = product.Price;
+        }
+
+        async function deleteProduct(id) {
+            const database = document.getElementById("database-select").value;
+            await fetch(`http://localhost:3000/products/${id}?database=${database}`, {
+                method: "DELETE",
+            });
+            fetchProducts();
+        }
+
+        document.getElementById("database-select").addEventListener("change", fetchProducts);
+        fetchProducts();
+    </script>
+</body>
+
+</html>

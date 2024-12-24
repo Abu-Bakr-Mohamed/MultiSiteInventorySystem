@@ -1,0 +1,75 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+node_modules/
+bower_components/
+
+# Build directories
+dist/
+build/
+.tmp/
+
+# Runtime files
+pids/
+*.pid
+*.pid.lock
+
+# Compiled files
+*.tsbuildinfo
+
+# IDE or Editor directories
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Database
+*.sqlite
+*.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# Miscellaneous
+*.bak
+*.swp
+*.swo
+
+# Optional npm cache
+.npm/
+
+# Optional yarn cache
+.yarn/
+
+# Optional REPL history
+.node_repl_history
+
+# Generated files
+package-lock.json
+yarn.lock
+
+# Deployment files
+.deploy/
